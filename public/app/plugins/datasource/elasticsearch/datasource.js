@@ -98,7 +98,7 @@ function (angular, _, moment, kbn, ElasticQueryBuilder, IndexPattern, ElasticRes
 
       var payload = angular.toJson(header) + '\n' + angular.toJson(data) + '\n';
 
-      return this._post('_msearch', payload).then(function(res) {
+      return this._post('_msearch&timeout=180000', payload).then(function(res) {
         var list = [];
         var hits = res.responses[0].hits.hits;
 
@@ -199,7 +199,7 @@ function (angular, _, moment, kbn, ElasticQueryBuilder, IndexPattern, ElasticRes
       payload = payload.replace(/\$timeTo/g, options.range.to.valueOf());
       payload = templateSrv.replace(payload, options.scopedVars);
 
-      return this._post('_msearch', payload).then(function(res) {
+      return this._post('_msearch&timeout=180000', payload).then(function(res) {
         return new ElasticResponse(sentTargets, res).getTimeSeries();
       });
     };
@@ -251,7 +251,7 @@ function (angular, _, moment, kbn, ElasticQueryBuilder, IndexPattern, ElasticRes
       esQuery = esQuery.replace(/\$timeTo/g, range.to.valueOf());
       esQuery = header + '\n' + esQuery + '\n';
 
-      return this._post('/_msearch?search_type=count', esQuery).then(function(res) {
+      return this._post('/_msearch?search_type=count&timeout=180000', esQuery).then(function(res) {
         var buckets = res.responses[0].aggregations["1"].buckets;
         return _.map(buckets, function(bucket) {
           return {text: bucket.key, value: bucket.key};
@@ -288,7 +288,7 @@ function (angular, _, moment, kbn, ElasticQueryBuilder, IndexPattern, ElasticRes
         sort: ["_uid"],
       };
 
-      return this._post(this.index + '/dashboard/_search', query)
+      return this._post(this.index + '/dashboard/_search&timeout=180000', query)
       .then(function(results) {
         if(_.isUndefined(results.hits)) {
           return { dashboards: [], tags: [] };
